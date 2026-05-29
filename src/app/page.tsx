@@ -6,7 +6,7 @@ export default function Home() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#3f2f15_0%,transparent_35%),radial-gradient(circle_at_bottom_right,#1e293b_0%,transparent_35%)]" />
 
       <section className="relative z-10 flex min-h-screen items-center justify-center px-6 py-10">
-        <div className="max-w-5xl rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-10 text-center shadow-2xl backdrop-blur">
+        <div className="w-full max-w-5xl rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-10 text-center shadow-2xl backdrop-blur">
           <div className="mb-6 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
             Per Intelligentiam ad Veritatem
           </div>
@@ -21,19 +21,9 @@ export default function Home() {
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-zinc-400 md:text-lg">
             Um app para ler, organizar, pesquisar e compreender documentos com
-            clareza. Onde arquivos deixam de ser silêncio e começam a revelar
+            clareza — onde arquivos deixam de ser silêncio e começam a revelar
             a verdade.
           </p>
-
-          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-            <button className="rounded-2xl bg-amber-300 px-7 py-4 font-bold text-zinc-950 shadow-lg shadow-amber-950/30 transition hover:bg-amber-200">
-              Enviar documento
-            </button>
-
-            <button className="rounded-2xl border border-zinc-700 px-7 py-4 font-bold text-zinc-200 transition hover:border-amber-300/60 hover:bg-zinc-900">
-              Abrir biblioteca
-            </button>
-          </div>
 
           <div className="mt-10">
             <FileUploader />
@@ -69,6 +59,12 @@ export default function Home() {
                 Apoio para contratos, peças, cláusulas e análise documental.
               </p>
             </div>
+          </div>
+
+          <div className="mt-12 border-t border-zinc-800 pt-6 text-center">
+            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+              Per Intelligentiam ad Veritatem
+            </p>
           </div>
         </div>
       </section>
