@@ -21,7 +21,7 @@ export default function Home() {
 
           <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-zinc-400 md:text-lg">
             Um app para ler, organizar, pesquisar e compreender documentos com
-            clareza — onde arquivos deixam de ser silêncio e começam a revelar
+            clareza. Onde arquivos deixam de ser silêncio e começam a revelar
             a verdade.
           </p>
 
