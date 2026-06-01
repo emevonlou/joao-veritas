@@ -1,12 +1,18 @@
 "use client";
 
 import { useRef, useState } from "react";
+import DocumentViewer from "@/components/DocumentViewer";
 
 export default function FileUploader() {
   const [fileName, setFileName] = useState("");
+  const [content, setContent] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleFileChange(
+  function openFilePicker() {
+    inputRef.current?.click();
+  }
+
+  async function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0];
@@ -14,10 +20,17 @@ export default function FileUploader() {
     if (!file) return;
 
     setFileName(file.name);
-  }
+    setContent("");
 
-  function openFilePicker() {
-    inputRef.current?.click();
+    if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+      const text = await file.text();
+      setContent(text);
+      return;
+    }
+
+    setContent(
+      "Por enquanto, o João Veritas já reconhece o arquivo, mas a leitura completa ainda está disponível apenas para TXT. PDF, DOCX e ODT serão adicionados nas próximas etapas."
+    );
   }
 
   return (
@@ -72,6 +85,8 @@ export default function FileUploader() {
           </div>
         )}
       </div>
+
+      <DocumentViewer content={content} />
     </div>
   );
 }
