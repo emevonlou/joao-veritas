@@ -6,7 +6,7 @@ export default function Home() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_top,#3f2f15_0%,transparent_35%),radial-gradient(circle_at_bottom_right,#1e293b_0%,transparent_35%)]" />
 
       <section className="relative z-10 flex min-h-screen items-center justify-center px-6 py-10">
-        <div className="w-full max-w-5xl rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-10 text-center shadow-2xl backdrop-blur">
+        <div className="w-full max-w-6xl rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-10 text-center shadow-2xl backdrop-blur">
           <div className="mb-6 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
             Per Intelligentiam ad Veritatem
           </div>
@@ -29,8 +29,8 @@ export default function Home() {
             <FileUploader />
           </div>
 
-          <div className="mt-12 grid gap-4 text-left md:grid-cols-3">
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+          <div className="mt-12 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 text-left">
               <h2 className="font-bold text-amber-200">
                 PDF, DOCX e ODT
               </h2>
@@ -40,7 +40,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 text-left">
               <h2 className="font-bold text-amber-200">
                 Resumo com IA
               </h2>
@@ -50,7 +50,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 text-left">
               <h2 className="font-bold text-amber-200">
                 Modo jurídico
               </h2>
@@ -59,6 +59,12 @@ export default function Home() {
                 Apoio para contratos, peças, cláusulas e análise documental.
               </p>
             </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-zinc-500">
+              Versão 0.1 • Leitura TXT disponível
+            </p>
           </div>
 
           <div className="mt-12 border-t border-zinc-800 pt-6 text-center">
