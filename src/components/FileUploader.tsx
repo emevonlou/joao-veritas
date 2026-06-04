@@ -6,6 +6,7 @@ import DocumentViewer from "@/components/DocumentViewer";
 export default function FileUploader() {
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   function openFilePicker() {
@@ -21,16 +22,41 @@ export default function FileUploader() {
 
     setFileName(file.name);
     setContent("");
+    setIsLoading(true);
 
-    if (file.type === "text/plain" || file.name.endsWith(".txt")) {
-      const text = await file.text();
-      setContent(text);
-      return;
+    try {
+      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+        const text = await file.text();
+        setContent(text);
+        return;
+      }
+
+      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/extract", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setContent(data.error || "Erro ao ler o PDF.");
+          return;
+        }
+
+        setContent(data.text);
+        return;
+      }
+
+      setContent(
+        "Por enquanto, o João Veritas lê TXT e PDF. DOCX e ODT serão adicionados nas próximas etapas."
+      );
+    } finally {
+      setIsLoading(false);
     }
-
-    setContent(
-      "Por enquanto, o João Veritas já reconhece o arquivo, mas a leitura completa ainda está disponível apenas para TXT. PDF, DOCX e ODT serão adicionados nas próximas etapas."
-    );
   }
 
   return (
@@ -83,6 +109,12 @@ export default function FileUploader() {
               {fileName}
             </p>
           </div>
+        )}
+
+        {isLoading && (
+          <p className="mt-4 text-sm text-zinc-400">
+            Lendo documento...
+          </p>
         )}
       </div>
 
