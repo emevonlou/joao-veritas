@@ -61,12 +61,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-zinc-500">
-              Versão 0.1 • Leitura TXT disponível
-            </p>
-          </div>
-
           <div className="mt-12 border-t border-zinc-800 pt-6 text-center">
             <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
               Per Intelligentiam ad Veritatem
