@@ -31,7 +31,13 @@ export default function FileUploader() {
         return;
       }
 
-      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+      if (
+        file.type === "application/pdf" ||
+        file.name.endsWith(".pdf") ||
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        file.name.endsWith(".docx")
+      ) {
         const formData = new FormData();
         formData.append("file", file);
 
@@ -43,16 +49,16 @@ export default function FileUploader() {
         const data = await response.json();
 
         if (!response.ok) {
-          setContent(data.error || "Erro ao ler o PDF.");
+          setContent(data.error || "Erro ao ler o documento.");
           return;
         }
 
         setContent(data.text);
         return;
-      }
+      }      
 
       setContent(
-        "Por enquanto, o João Veritas lê TXT e PDF. DOCX e ODT serão adicionados nas próximas etapas."
+        "Por enquanto, o João Veritas lê TXT, PDF e DOCX. ODT será adicionado nas próximas etapas."
       );
     } finally {
       setIsLoading(false);
