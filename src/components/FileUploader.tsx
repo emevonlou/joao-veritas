@@ -7,19 +7,14 @@ export default function FileUploader() {
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   function openFilePicker() {
     inputRef.current?.click();
   }
 
-  async function handleFileChange(
-    event: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
+  async function processFile(file: File) {
     setFileName(file.name);
     setContent("");
     setIsLoading(true);
@@ -55,7 +50,7 @@ export default function FileUploader() {
 
         setContent(data.text);
         return;
-      }      
+      }
 
       setContent(
         "Por enquanto, o João Veritas lê TXT, PDF e DOCX. ODT será adicionado nas próximas etapas."
@@ -65,11 +60,44 @@ export default function FileUploader() {
     }
   }
 
+  async function handleFileChange(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    await processFile(file);
+  }
+
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8">
+    <div
+      className={`rounded-2xl border p-8 transition ${
+        isDragging
+          ? "border-amber-400 bg-zinc-800/80"
+          : "border-zinc-800 bg-zinc-900/60"
+      }`}
+      onDragOver={(event) => {
+        event.preventDefault();
+        setIsDragging(true);
+      }}
+      onDragLeave={() => {
+        setIsDragging(false);
+      }}
+      onDrop={async (event) => {
+        event.preventDefault();
+        setIsDragging(false);
+
+        const file = event.dataTransfer.files?.[0];
+
+        if (!file) return;
+
+        await processFile(file);
+      }}
+    >
       <div className="text-center">
         <span className="mb-6 block text-sm tracking-wide text-zinc-400">
-          Selecione um documento para análise
+          Selecione ou arraste um documento para análise
         </span>
 
         <input
