@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import DocumentViewer from "@/components/DocumentViewer";
 
 export default function FileUploader() {
@@ -8,30 +8,25 @@ export default function FileUploader() {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function openFilePicker() {
-    inputRef.current?.click();
-  }
+  const [status, setStatus] = useState("");
 
   async function processFile(file: File) {
     setFileName(file.name);
     setContent("");
     setIsLoading(true);
+    setStatus(`Arquivo recebido: ${file.name}`);
 
     try {
-      if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+      if (file.name.toLowerCase().endsWith(".txt")) {
         const text = await file.text();
         setContent(text);
+        setStatus(`TXT lido com sucesso: ${file.name}`);
         return;
       }
 
       if (
-        file.type === "application/pdf" ||
-        file.name.endsWith(".pdf") ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-        file.name.endsWith(".docx")
+        file.name.toLowerCase().endsWith(".pdf") ||
+        file.name.toLowerCase().endsWith(".docx")
       ) {
         const formData = new FormData();
         formData.append("file", file);
@@ -45,16 +40,23 @@ export default function FileUploader() {
 
         if (!response.ok) {
           setContent(data.error || "Erro ao ler o documento.");
+          setStatus("Erro ao processar documento.");
           return;
         }
 
         setContent(data.text);
+        setStatus(`Documento lido com sucesso: ${file.name}`);
         return;
       }
 
       setContent(
         "Por enquanto, o João Veritas lê TXT, PDF e DOCX. ODT será adicionado nas próximas etapas."
       );
+      setStatus("Formato ainda não suportado.");
+    } catch (error) {
+      console.error("Erro ao processar arquivo:", error);
+      setContent("Não foi possível processar este arquivo.");
+      setStatus("Erro ao processar arquivo.");
     } finally {
       setIsLoading(false);
     }
@@ -63,9 +65,14 @@ export default function FileUploader() {
   async function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    const file = event.target.files?.[0];
+    setStatus("Tentando receber arquivo...");
 
-    if (!file) return;
+    const file = event.currentTarget.files?.[0];
+
+    if (!file) {
+      setStatus("Nenhum arquivo chegou ao app.");
+      return;
+    }
 
     await processFile(file);
   }
@@ -90,7 +97,10 @@ export default function FileUploader() {
 
         const file = event.dataTransfer.files?.[0];
 
-        if (!file) return;
+        if (!file) {
+          setStatus("Nenhum arquivo recebido por arrastar e soltar.");
+          return;
+        }
 
         await processFile(file);
       }}
@@ -101,35 +111,34 @@ export default function FileUploader() {
         </span>
 
         <input
-          ref={inputRef}
           type="file"
-          accept=".pdf,.docx,.txt,.odt"
+          name="document"
+          accept=".txt,.pdf,.docx"
           onChange={handleFileChange}
-          className="hidden"
-        />
-
-        <button
-          onClick={openFilePicker}
           className="
-            rounded-2xl
+            mx-auto
+            block
+            w-full
+            max-w-sm
+            rounded-xl
             border
             border-amber-500/30
-            bg-zinc-900
-            px-8
-            py-4
-            font-semibold
-            text-zinc-200
-            transition
-            hover:border-amber-300/50
-            hover:bg-zinc-800
+            bg-zinc-950
+            p-3
+            text-sm
+            text-zinc-300
           "
-        >
-          Selecionar Documento
-        </button>
+        />
+
+        {status && (
+          <p className="mt-4 break-words text-sm text-amber-200">
+            {status}
+          </p>
+        )}
 
         {!fileName && (
           <p className="mt-4 text-sm text-zinc-500">
-            PDF • DOCX • ODT • TXT
+            PDF • DOCX • TXT
           </p>
         )}
 
@@ -139,7 +148,7 @@ export default function FileUploader() {
               Documento selecionado
             </p>
 
-            <p className="mt-1 font-medium text-amber-200">
+            <p className="mt-1 break-all text-sm font-medium text-amber-200">
               {fileName}
             </p>
           </div>
