@@ -11,6 +11,7 @@ export default function DocumentViewer({
 }: DocumentViewerProps) {
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [model, setModel] = useState("llama3.2:3b");
 
   if (!content) return null;
 
@@ -26,6 +27,7 @@ export default function DocumentViewer({
         },
         body: JSON.stringify({
           text: content,
+          model,
         }),
       });
 
@@ -46,39 +48,74 @@ export default function DocumentViewer({
 
   return (
     <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-left">
-      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-semibold text-amber-200">
-          Conteúdo do Documento
-        </h2>
+      <div className="mb-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-amber-200">
+            Conteúdo do Documento
+          </h2>
 
-        <button
-          onClick={handleSummarize}
-          disabled={isSummarizing}
-          className="
-            rounded-xl
-            border
-            border-amber-500/30
-            bg-zinc-900
-            px-4
-            py-2
-            text-sm
-            font-semibold
-            text-zinc-200
-            transition
-            hover:border-amber-300/50
-            hover:bg-zinc-800
-            disabled:cursor-not-allowed
-            disabled:opacity-50
-          "
-        >
-          {isSummarizing ? "Resumindo..." : "Resumir com IA local"}
-        </button>
+          <button
+            onClick={handleSummarize}
+            disabled={isSummarizing}
+            className="
+              rounded-xl
+              border
+              border-amber-500/30
+              bg-zinc-900
+              px-4
+              py-2
+              text-sm
+              font-semibold
+              text-zinc-200
+              transition
+              hover:border-amber-300/50
+              hover:bg-zinc-800
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
+          >
+            {isSummarizing
+              ? "Resumindo..."
+              : "Resumir com IA local"}
+          </button>
+        </div>
+
+        <div>
+          <label
+            className="mb-2 block text-xs uppercase tracking-[0.2em] text-zinc-500"
+          >
+            Modelo Local
+          </label>
+
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-zinc-700
+              bg-zinc-900
+              px-4
+              py-3
+              text-zinc-200
+            "
+          >
+            <option value="llama3.2:3b">
+              Llama 3.2 (3B)
+            </option>
+
+            <option value="qwen3:4b">
+              Qwen 3 (4B)
+            </option>
+          </select>
+        </div>
       </div>
 
       {summary && (
         <div className="mb-6 rounded-2xl border border-amber-500/20 bg-zinc-900/70 p-5">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">
-            Resumo
+            Resumo ({model})
           </h3>
 
           <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">
