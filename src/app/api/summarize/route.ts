@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 
+const DEFAULT_MODEL = "llama3.2:3b";
+
 export async function POST(request: Request) {
   try {
-    const { text } = await request.json();
+    const { text, model } = await request.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json(
@@ -11,13 +13,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const selectedModel =
+      typeof model === "string" && model.trim()
+        ? model.trim()
+        : DEFAULT_MODEL;
+
     const response = await fetch("http://localhost:11434/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3.2:3b",
+        model: selectedModel,
         prompt: `Resuma em português, em até 5 linhas, com clareza:\n\n${text.slice(0, 8000)}`,
         stream: false,
       }),
@@ -25,7 +32,7 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       return NextResponse.json(
-        { error: "Não foi possível conectar ao Ollama." },
+        { error: `Não foi possível conectar ao modelo ${selectedModel}.` },
         { status: 500 }
       );
     }
@@ -33,6 +40,7 @@ export async function POST(request: Request) {
     const data = await response.json();
 
     return NextResponse.json({
+      model: selectedModel,
       summary: data.response || "Não foi possível gerar resumo.",
     });
   } catch (error) {
@@ -44,4 +52,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
