@@ -13,6 +13,10 @@ export default function DocumentViewer({
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [model, setModel] = useState("llama3.2:3b");
 
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [isAsking, setIsAsking] = useState(false);
+
   if (!content) return null;
 
   async function handleSummarize() {
@@ -43,6 +47,40 @@ export default function DocumentViewer({
       setSummary("Erro ao conectar com a IA local.");
     } finally {
       setIsSummarizing(false);
+    }
+  }
+
+  async function handleAsk() {
+    if (!question.trim()) return;
+
+    setAnswer("");
+    setIsAsking(true);
+
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: content,
+          question,
+          model,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setAnswer(data.error || "Erro ao perguntar ao documento.");
+        return;
+      }
+
+      setAnswer(data.answer);
+    } catch {
+      setAnswer("Erro ao conectar com a IA local.");
+    } finally {
+      setIsAsking(false);
     }
   }
 
@@ -81,9 +119,7 @@ export default function DocumentViewer({
         </div>
 
         <div>
-          <label
-            className="mb-2 block text-xs uppercase tracking-[0.2em] text-zinc-500"
-          >
+          <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-zinc-500">
             Modelo Local
           </label>
 
@@ -123,6 +159,68 @@ export default function DocumentViewer({
           </p>
         </div>
       )}
+
+      <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">
+          Pergunte ao documento
+        </h3>
+
+        <textarea
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="Ex.: Qual é o valor do aluguel?"
+          className="
+            min-h-24
+            w-full
+            rounded-xl
+            border
+            border-zinc-700
+            bg-zinc-950
+            p-4
+            text-sm
+            text-zinc-200
+            outline-none
+            placeholder:text-zinc-600
+            focus:border-amber-500/50
+          "
+        />
+
+        <button
+          onClick={handleAsk}
+          disabled={isAsking || !question.trim()}
+          className="
+            mt-4
+            rounded-xl
+            border
+            border-amber-500/30
+            bg-zinc-900
+            px-4
+            py-2
+            text-sm
+            font-semibold
+            text-zinc-200
+            transition
+            hover:border-amber-300/50
+            hover:bg-zinc-800
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
+        >
+          {isAsking ? "Perguntando..." : "Perguntar"}
+        </button>
+
+        {answer && (
+          <div className="mt-5 rounded-xl border border-amber-500/20 bg-zinc-950 p-4">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
+              Resposta ({model})
+            </h4>
+
+            <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">
+              {answer}
+            </p>
+          </div>
+        )}
+      </div>
 
       <pre className="max-h-[500px] overflow-auto whitespace-pre-wrap rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm text-zinc-300">
         {content}
