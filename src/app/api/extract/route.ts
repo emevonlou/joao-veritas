@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { extractPdfText } from "@/lib/extractPdf";
 import { extractDocxText } from "@/lib/extractDocx";
+import { extractOdtText } from "@/lib/extractOdt";
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +36,17 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         text: text || "Não foi possível extrair texto deste DOCX.",
+      });
+    }
+
+    if (
+      file.type === "application/vnd.oasis.opendocument.text" ||
+      fileName.endsWith(".odt")
+    ) {
+      const text = await extractOdtText(buffer);
+
+      return NextResponse.json({
+        text: text || "Não foi possível extrair texto deste ODT.",
       });
     }
 

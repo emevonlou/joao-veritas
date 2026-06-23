@@ -26,7 +26,8 @@ export default function FileUploader() {
 
       if (
         file.name.toLowerCase().endsWith(".pdf") ||
-        file.name.toLowerCase().endsWith(".docx")
+        file.name.toLowerCase().endsWith(".docx") ||
+        file.name.toLowerCase().endsWith(".odt")
       ) {
         const formData = new FormData();
         formData.append("file", file);
@@ -113,7 +114,7 @@ export default function FileUploader() {
         <input
           type="file"
           name="document"
-          accept=".txt,.pdf,.docx"
+          accept=".txt,.pdf,.docx,.odt"
           onChange={handleFileChange}
           className="
             mx-auto
@@ -138,7 +139,7 @@ export default function FileUploader() {
 
         {!fileName && (
           <p className="mt-4 text-sm text-zinc-500">
-            PDF • DOCX • TXT
+            PDF • DOCX • ODT • TXT
           </p>
         )}
 
