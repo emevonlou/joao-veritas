@@ -20,11 +20,23 @@ export async function POST(request: Request) {
     const fileName = file.name.toLowerCase();
 
     if (file.type === "application/pdf" || fileName.endsWith(".pdf")) {
-      const text = await extractPdfText(buffer);
+      try {
+        const text = await extractPdfText(buffer);
 
-      return NextResponse.json({
-        text: text || "Não foi possível extrair texto deste PDF.",
-      });
+        return NextResponse.json({
+          text: text || "Não foi possível extrair texto deste PDF.",
+        });
+      } catch (error) {
+        console.error("Erro ao extrair PDF:", error);
+
+        return NextResponse.json(
+          {
+            error:
+              "Não foi possível ler este PDF. O arquivo pode estar corrompido, incompleto, protegido ou ser uma imagem escaneada.",
+          },
+          { status: 422 }
+        );
+      }
     }
 
     if (

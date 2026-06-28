@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type DocumentViewerProps = {
   content: string;
@@ -12,14 +12,40 @@ type ChatMessage = {
   model: string;
 };
 
+type OllamaModel = {
+  name: string;
+};
+
 export default function DocumentViewer({ content }: DocumentViewerProps) {
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [model, setModel] = useState("llama3.2:3b");
+  const [availableModels, setAvailableModels] = useState<OllamaModel[]>([]);
 
   const [question, setQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isAsking, setIsAsking] = useState(false);
+
+  useEffect(() => {
+    async function loadModels() {
+      try {
+        const response = await fetch("/api/models");
+        const data = await response.json();
+
+        if (!response.ok || !Array.isArray(data.models)) return;
+
+        setAvailableModels(data.models);
+
+        if (data.models.length > 0) {
+          setModel(data.models[0].name);
+        }
+      } catch {
+        setAvailableModels([]);
+      }
+    }
+
+    loadModels();
+  }, []);
 
   if (!content) return null;
 
@@ -140,8 +166,18 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
               px-4 py-3 text-zinc-200
             "
           >
-            <option value="llama3.2:3b">Llama 3.2 (3B)</option>
-            <option value="qwen3:4b">Qwen 3 (4B)</option>
+            {availableModels.length > 0 ? (
+              availableModels.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.name}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value="llama3.2:3b">llama3.2:3b</option>
+                <option value="qwen3:4b">qwen3:4b</option>
+              </>
+            )}
           </select>
         </div>
       </div>
