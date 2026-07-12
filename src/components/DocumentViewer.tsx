@@ -9,6 +9,7 @@ type DocumentViewerProps = {
 type ChatMessage = {
   question: string;
   answer: string;
+  excerpt: string;
   model: string;
 };
 
@@ -16,9 +17,12 @@ type OllamaModel = {
   name: string;
 };
 
-export default function DocumentViewer({ content }: DocumentViewerProps) {
+export default function DocumentViewer({
+  content,
+}: DocumentViewerProps) {
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
+
   const [model, setModel] = useState("llama3.2:3b");
   const [availableModels, setAvailableModels] = useState<OllamaModel[]>([]);
 
@@ -32,7 +36,9 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
         const response = await fetch("/api/models");
         const data = await response.json();
 
-        if (!response.ok || !Array.isArray(data.models)) return;
+        if (!response.ok || !Array.isArray(data.models)) {
+          return;
+        }
 
         setAvailableModels(data.models);
 
@@ -47,7 +53,9 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
     loadModels();
   }, []);
 
-  if (!content) return null;
+  if (!content) {
+    return null;
+  }
 
   async function handleSummarize() {
     setSummary("");
@@ -59,7 +67,10 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: content, model }),
+        body: JSON.stringify({
+          text: content,
+          model,
+        }),
       });
 
       const data = await response.json();
@@ -80,7 +91,9 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
   async function handleAsk() {
     const currentQuestion = question.trim();
 
-    if (!currentQuestion) return;
+    if (!currentQuestion) {
+      return;
+    }
 
     setIsAsking(true);
 
@@ -106,6 +119,7 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
           answer: response.ok
             ? data.answer
             : data.error || "Erro ao perguntar ao documento.",
+          excerpt: response.ok ? data.excerpt || "" : "",
           model,
         },
       ]);
@@ -119,6 +133,7 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
         {
           question: currentQuestion,
           answer: "Erro ao conectar com a IA local.",
+          excerpt: "",
           model,
         },
       ]);
@@ -140,42 +155,73 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
           </h2>
 
           <button
+            type="button"
             onClick={handleSummarize}
             disabled={isSummarizing}
             className="
-              rounded-xl border border-amber-500/30 bg-zinc-900 px-4 py-2
-              text-sm font-semibold text-zinc-200 transition
-              hover:border-amber-300/50 hover:bg-zinc-800
-              disabled:cursor-not-allowed disabled:opacity-50
+              rounded-xl
+              border
+              border-amber-500/30
+              bg-zinc-900
+              px-4
+              py-2
+              text-sm
+              font-semibold
+              text-zinc-200
+              transition
+              hover:border-amber-300/50
+              hover:bg-zinc-800
+              disabled:cursor-not-allowed
+              disabled:opacity-50
             "
           >
-            {isSummarizing ? "Resumindo..." : "Resumir com IA local"}
+            {isSummarizing
+              ? "Resumindo..."
+              : "Resumir com IA local"}
           </button>
         </div>
 
         <div>
-          <label className="mb-2 block text-xs uppercase tracking-[0.2em] text-zinc-500">
+          <label
+            htmlFor="local-model"
+            className="mb-2 block text-xs uppercase tracking-[0.2em] text-zinc-500"
+          >
             Modelo Local
           </label>
 
           <select
+            id="local-model"
             value={model}
             onChange={(event) => setModel(event.target.value)}
             className="
-              w-full rounded-xl border border-zinc-700 bg-zinc-900
-              px-4 py-3 text-zinc-200
+              w-full
+              rounded-xl
+              border
+              border-zinc-700
+              bg-zinc-900
+              px-4
+              py-3
+              text-zinc-200
             "
           >
             {availableModels.length > 0 ? (
               availableModels.map((item) => (
-                <option key={item.name} value={item.name}>
+                <option
+                  key={item.name}
+                  value={item.name}
+                >
                   {item.name}
                 </option>
               ))
             ) : (
               <>
-                <option value="llama3.2:3b">llama3.2:3b</option>
-                <option value="qwen3:4b">qwen3:4b</option>
+                <option value="llama3.2:3b">
+                  llama3.2:3b
+                </option>
+
+                <option value="qwen3:4b">
+                  qwen3:4b
+                </option>
               </>
             )}
           </select>
@@ -204,21 +250,41 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
           onChange={(event) => setQuestion(event.target.value)}
           placeholder="Ex.: Qual é o valor do aluguel?"
           className="
-            min-h-24 w-full rounded-xl border border-zinc-700 bg-zinc-950
-            p-4 text-sm text-zinc-200 outline-none
-            placeholder:text-zinc-600 focus:border-amber-500/50
+            min-h-24
+            w-full
+            rounded-xl
+            border
+            border-zinc-700
+            bg-zinc-950
+            p-4
+            text-sm
+            text-zinc-200
+            outline-none
+            placeholder:text-zinc-600
+            focus:border-amber-500/50
           "
         />
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <button
+            type="button"
             onClick={handleAsk}
             disabled={isAsking || !question.trim()}
             className="
-              rounded-xl border border-amber-500/30 bg-zinc-900 px-4 py-2
-              text-sm font-semibold text-zinc-200 transition
-              hover:border-amber-300/50 hover:bg-zinc-800
-              disabled:cursor-not-allowed disabled:opacity-50
+              rounded-xl
+              border
+              border-amber-500/30
+              bg-zinc-900
+              px-4
+              py-2
+              text-sm
+              font-semibold
+              text-zinc-200
+              transition
+              hover:border-amber-300/50
+              hover:bg-zinc-800
+              disabled:cursor-not-allowed
+              disabled:opacity-50
             "
           >
             {isAsking ? "Perguntando..." : "Perguntar"}
@@ -226,11 +292,21 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
 
           {chatHistory.length > 0 && (
             <button
+              type="button"
               onClick={() => setChatHistory([])}
               className="
-                rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2
-                text-sm font-semibold text-zinc-400 transition
-                hover:border-zinc-500 hover:text-zinc-200
+                rounded-xl
+                border
+                border-zinc-700
+                bg-zinc-950
+                px-4
+                py-2
+                text-sm
+                font-semibold
+                text-zinc-400
+                transition
+                hover:border-zinc-500
+                hover:text-zinc-200
               "
             >
               Limpar conversa
@@ -259,11 +335,23 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
                   </p>
 
                   <button
-                    onClick={() => copyToClipboard(message.answer)}
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(message.answer)
+                    }
                     className="
-                      rounded-lg border border-zinc-700 px-3 py-1
-                      text-xs font-semibold text-zinc-400 transition
-                      hover:border-amber-500/40 hover:text-amber-200
+                      shrink-0
+                      rounded-lg
+                      border
+                      border-zinc-700
+                      px-3
+                      py-1
+                      text-xs
+                      font-semibold
+                      text-zinc-400
+                      transition
+                      hover:border-amber-500/40
+                      hover:text-amber-200
                     "
                   >
                     Copiar
@@ -273,6 +361,18 @@ export default function DocumentViewer({ content }: DocumentViewerProps) {
                 <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">
                   {message.answer}
                 </p>
+
+                {message.excerpt && (
+                  <div className="mt-4 rounded-xl border border-sky-500/20 bg-sky-950/20 p-4">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
+                      Trecho do documento
+                    </p>
+
+                    <blockquote className="border-l-2 border-sky-400/40 pl-4 text-sm italic leading-7 text-zinc-300">
+                      {message.excerpt}
+                    </blockquote>
+                  </div>
+                )}
               </div>
             ))}
           </div>
