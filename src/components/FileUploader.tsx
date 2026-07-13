@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import DocumentViewer from "@/components/DocumentViewer";
+import { saveDocument } from "@/lib/documentStorage";
 
 export default function FileUploader() {
   const [fileName, setFileName] = useState("");
@@ -10,6 +11,18 @@ export default function FileUploader() {
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState("");
 
+  function storeDocument(file: File, extractedText: string) {
+    const now = Date.now();
+
+    saveDocument({
+      id: `${file.name}-${file.size}-${file.lastModified}`,
+      name: file.name,
+      content: extractedText,
+      createdAt: now,
+      lastOpened: now,
+    });
+  }
+
   async function processFile(file: File) {
     setFileName(file.name);
     setContent("");
@@ -17,17 +30,21 @@ export default function FileUploader() {
     setStatus(`Arquivo recebido: ${file.name}`);
 
     try {
-      if (file.name.toLowerCase().endsWith(".txt")) {
+      const lowerFileName = file.name.toLowerCase();
+
+      if (lowerFileName.endsWith(".txt")) {
         const text = await file.text();
+
         setContent(text);
-        setStatus(`TXT lido com sucesso: ${file.name}`);
+        storeDocument(file, text);
+        setStatus(`TXT lido e salvo com sucesso: ${file.name}`);
         return;
       }
 
       if (
-        file.name.toLowerCase().endsWith(".pdf") ||
-        file.name.toLowerCase().endsWith(".docx") ||
-        file.name.toLowerCase().endsWith(".odt")
+        lowerFileName.endsWith(".pdf") ||
+        lowerFileName.endsWith(".docx") ||
+        lowerFileName.endsWith(".odt")
       ) {
         const formData = new FormData();
         formData.append("file", file);
@@ -45,17 +62,28 @@ export default function FileUploader() {
           return;
         }
 
-        setContent(data.text);
-        setStatus(`Documento lido com sucesso: ${file.name}`);
+        const extractedText =
+          typeof data.text === "string" ? data.text : "";
+
+        if (!extractedText.trim()) {
+          setContent("Nenhum texto foi encontrado neste documento.");
+          setStatus("O documento não possui texto extraível.");
+          return;
+        }
+
+        setContent(extractedText);
+        storeDocument(file, extractedText);
+        setStatus(`Documento lido e salvo com sucesso: ${file.name}`);
         return;
       }
 
       setContent(
-        "Por enquanto, o João Veritas lê TXT, PDF e DOCX. ODT será adicionado nas próximas etapas."
+        "Formato não suportado. O João Veritas lê TXT, PDF, DOCX e ODT."
       );
       setStatus("Formato ainda não suportado.");
     } catch (error) {
       console.error("Erro ao processar arquivo:", error);
+
       setContent("Não foi possível processar este arquivo.");
       setStatus("Erro ao processar arquivo.");
     } finally {
