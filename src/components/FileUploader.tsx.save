@@ -1,6 +1,6 @@
-"use client";
+<DocumentViewer content={content}"use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import DocumentViewer from "@/components/DocumentViewer";
 import DocumentLibrary from "@/components/DocumentLibrary";
@@ -16,14 +16,7 @@ export default function FileUploader() {
   const [isLoading, setIsLoading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState("");
-
-  const [documents, setDocuments] = useState<
-    ReturnType<typeof getDocuments>
-  >([]);
-
-  useEffect(() => {
-    setDocuments(getDocuments());
-  }, []);
+  const [documents, setDocuments] = useState(getDocuments());
 
   function storeDocument(file: File, extractedText: string) {
     const now = Date.now();
@@ -207,10 +200,10 @@ export default function FileUploader() {
       </div>
 
       <DocumentViewer content={content} />
-
+      
       <DocumentLibrary
         documents={documents}
-      />
+/>
     </div>
   );
 }
