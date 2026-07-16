@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import DocumentViewer from "@/components/DocumentViewer";
 import DocumentLibrary from "@/components/DocumentLibrary";
 
+import { SavedDocument } from "@/types/document";
+
 import {
   getDocuments,
   saveDocument,
@@ -122,6 +124,12 @@ export default function FileUploader() {
     await processFile(file);
   }
 
+  function openSavedDocument(document: SavedDocument) {
+    setFileName(document.name);
+    setContent(document.content);
+    setStatus(`Documento aberto da biblioteca: ${document.name}`);
+  }
+
   return (
     <div
       className={`rounded-2xl border p-8 transition ${
@@ -210,6 +218,7 @@ export default function FileUploader() {
 
       <DocumentLibrary
         documents={documents}
+        onOpen={openSavedDocument}
       />
     </div>
   );
