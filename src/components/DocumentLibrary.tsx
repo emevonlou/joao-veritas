@@ -4,11 +4,13 @@ import { SavedDocument } from "@/types/document";
 
 type DocumentLibraryProps = {
   documents: SavedDocument[];
+  currentDocument?: string;
   onOpen: (document: SavedDocument) => void;
 };
 
 export default function DocumentLibrary({
   documents,
+  currentDocument,
   onOpen,
 }: DocumentLibraryProps) {
   if (documents.length === 0) {
@@ -35,7 +37,11 @@ export default function DocumentLibrary({
         {documents.map((document) => (
           <div
             key={document.id}
-            className="rounded-xl border border-zinc-700 bg-zinc-950 p-4"
+            className={`rounded-xl border p-4 transition ${
+              currentDocument === document.id
+                ? "border-amber-500 bg-amber-950/20"
+                : "border-zinc-700 bg-zinc-950"
+            }`}
           >
             <p className="break-all font-medium text-amber-200">
               {document.name}

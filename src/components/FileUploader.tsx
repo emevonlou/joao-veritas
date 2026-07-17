@@ -19,6 +19,7 @@ export default function FileUploader() {
   const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState("");
 
+  const [currentDocumentId, setCurrentDocumentId] = useState<string>();
   const [documents, setDocuments] = useState<
     ReturnType<typeof getDocuments>
   >([]);
@@ -125,6 +126,7 @@ export default function FileUploader() {
   }
 
   function openSavedDocument(document: SavedDocument) {
+    setCurrentDocumentId(document.id);
     setFileName(document.name);
     setContent(document.content);
     setStatus(`Documento aberto da biblioteca: ${document.name}`);
@@ -218,6 +220,7 @@ export default function FileUploader() {
 
       <DocumentLibrary
         documents={documents}
+        currentDocument={currentDocumentId}
         onOpen={openSavedDocument}
       />
     </div>
