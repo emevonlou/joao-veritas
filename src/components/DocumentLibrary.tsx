@@ -6,12 +6,14 @@ type DocumentLibraryProps = {
   documents: SavedDocument[];
   currentDocument?: string;
   onOpen: (document: SavedDocument) => void;
+  onDelete: (id: string) => void;
 };
 
 export default function DocumentLibrary({
   documents,
   currentDocument,
   onOpen,
+  onDelete,
 }: DocumentLibraryProps) {
   if (documents.length === 0) {
     return (
@@ -52,27 +54,49 @@ export default function DocumentLibrary({
               {new Date(document.lastOpened).toLocaleString()}
             </p>
 
-            <button
-              type="button"
-              onClick={() => onOpen(document)}
-              className="
-                mt-4
-                rounded-xl
-                border
-                border-amber-500/30
-                bg-zinc-900
-                px-4
-                py-2
-                text-sm
-                font-semibold
-                text-zinc-200
-                transition
-                hover:border-amber-300/50
-                hover:bg-zinc-800
-              "
-            >
-              Abrir
-            </button>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => onOpen(document)}
+                className="
+                  rounded-xl
+                  border
+                  border-amber-500/30
+                  bg-zinc-900
+                  px-4
+                  py-2
+                  text-sm
+                  font-semibold
+                  text-zinc-200
+                  transition
+                  hover:border-amber-300/50
+                  hover:bg-zinc-800
+                 "
+              >
+                 Abrir
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onDelete(document.id)}
+                className="
+                  rounded-xl
+                  border
+                  border-red-500/30
+                  bg-red-950/40
+                  px-4
+                  py-2
+                  text-sm
+                  font-semibold
+                  text-red-200
+                  transition
+                  hover:border-red-400/50
+                  hover:bg-red-900/50
+                "
+              >
+                Excluir
+              </button>
+           </div>
           </div>
         ))}
       </div>
