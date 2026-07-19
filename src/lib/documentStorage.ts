@@ -34,3 +34,15 @@ export function saveDocument(document: SavedDocument) {
     JSON.stringify(filtered)
   );
 }
+export function deleteDocument(id: string) {
+  const documents = getDocuments();
+
+  const updatedDocuments = documents.filter(
+    (document) => document.id !== id
+  );
+
+  localStorage.setItem(
+    "joao-veritas-documents",
+    JSON.stringify(updatedDocuments)
+  );
+}

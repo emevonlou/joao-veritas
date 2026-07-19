@@ -8,6 +8,7 @@ import DocumentLibrary from "@/components/DocumentLibrary";
 import { SavedDocument } from "@/types/document";
 
 import {
+  deleteDocument,
   getDocuments,
   saveDocument,
 } from "@/lib/documentStorage";
@@ -131,6 +132,25 @@ export default function FileUploader() {
     setContent(document.content);
     setStatus(`Documento aberto da biblioteca: ${document.name}`);
   }
+  function deleteSavedDocument(id: string) {
+    const confirmed = window.confirm(
+      "Tem certeza de que deseja excluir este documento?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    deleteDocument(id);
+    setDocuments(getDocuments());
+
+    if (currentDocumentId === id) {
+      setCurrentDocumentId(undefined);
+      setFileName("");
+      setContent("");
+      setStatus("Documento excluído da biblioteca.");
+    }
+  }
 
   return (
     <div
@@ -222,6 +242,7 @@ export default function FileUploader() {
         documents={documents}
         currentDocument={currentDocumentId}
         onOpen={openSavedDocument}
+        onDelete={deleteSavedDocument}
       />
     </div>
   );
