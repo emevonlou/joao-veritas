@@ -1,16 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChatMessage } from "@/types/chat";
 
 type DocumentViewerProps = {
   content: string;
-};
-
-type ChatMessage = {
-  question: string;
-  answer: string;
-  excerpt: string;
-  model: string;
+  messages?: ChatMessage[];
 };
 
 type OllamaModel = {
@@ -19,6 +14,7 @@ type OllamaModel = {
 
 export default function DocumentViewer({
   content,
+  messages,
 }: DocumentViewerProps) {
   const [summary, setSummary] = useState("");
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -29,6 +25,12 @@ export default function DocumentViewer({
   const [question, setQuestion] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [isAsking, setIsAsking] = useState(false);
+  
+  useEffect(() => {
+    if (messages) {
+      setChatHistory(messages);
+    }
+  }, [messages]);
 
   useEffect(() => {
     async function loadModels() {
